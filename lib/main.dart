@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:wikipedia_search/wikidata.dart';
+import 'wikidata.dart';
 import 'package:html/parser.dart';
 
 void main() {
@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'wikipedia Search',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.blueGrey,
         // This makes the visual density adapt to the platform that you run
         // the app on. For desktop platforms, the controls will be smaller and
         // closer together (more dense) than on mobile platforms.
@@ -170,11 +171,31 @@ class _MyHomePageState extends State<MyHomePage> {
                                       color: Color(0XFFe6e6e7),
                                       borderRadius: BorderRadius.circular(5.0),
                                     ),
-                                    child: ListTile(
+                                    child: ExpansionTile(
+                                      leading: Image.asset(
+                                        "assets/wikilogo.png",
+                                        height: 30,
+                                        width: 30,
+                                      ),
                                       title: Text(
-                                          WikiData.query.search[index].title,style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),),
-                                      subtitle: Text(parseToHtml(WikiData
-                                          .query.search[index].snippet),style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600),),
+                                        WikiData.query.search[index].title,
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            parseToHtml(WikiData
+                                                .query.search[index].snippet),
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.grey[600],
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   );
                                 })
@@ -195,11 +216,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   GetSearchData({String search}) async {
-    /*if(WikiData!=null){
+    if (WikiData != null) {
       setState(() {
-
+        WikiData = null;
       });
-    }*/
+    }
     http.Response response = await http.get(
         "https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=$search");
     if (response.statusCode == 200) {
